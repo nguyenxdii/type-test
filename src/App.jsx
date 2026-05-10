@@ -9,7 +9,7 @@ const WORD_LISTS = {
   en: english1k.words,
   vi: vietnamese1k.words
 };
-
+// Project configuration
 const TEST_DURATION = 60;
 
 function App() {
