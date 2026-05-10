@@ -42,17 +42,17 @@ function App() {
   useEffect(() => {
     audioCtx.current = new (window.AudioContext || window.webkitAudioContext)();
 
-    const soundModules = import.meta.glob('./assets/sound/*.mp3', { eager: true, as: 'url' });
-    Object.entries(soundModules).forEach(([path, url]) => {
-      const keyMatch = path.match(/\/([^/]+)\.mp3$/);
-      if (keyMatch) {
-        const key = keyMatch[1];
-        fetch(url)
-          .then(res => res.arrayBuffer())
-          .then(data => audioCtx.current.decodeAudioData(data))
-          .then(buffer => { audioBuffers.current[key] = buffer; })
-          .catch(e => console.error("Audio Load Error:", key, e));
-      }
+    // Load sounds từ thư mục public/sound/
+    const soundKeys = ['backspace', ...'abcdefghijklmnopqrstuvwxyz'.split('')];
+    soundKeys.forEach(key => {
+      fetch(`/sound/${key}.mp3`)
+        .then(res => {
+          if (!res.ok) throw new Error(`Not found: ${key}`);
+          return res.arrayBuffer();
+        })
+        .then(data => audioCtx.current.decodeAudioData(data))
+        .then(buffer => { audioBuffers.current[key] = buffer; })
+        .catch(e => console.warn("Audio Load Warning:", key, e));
     });
 
     generateWords();
