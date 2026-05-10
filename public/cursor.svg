@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" shape-rendering="crispEdges">
+  <!-- Black outline -->
+  <polygon points="0,0 0,15 4,11 7,18 10,16 7,9 12,9 0,0" fill="#1e1e2e" stroke="#1e1e2e" stroke-width="2" stroke-linejoin="round"/>
+  <!-- Accent fill -->
+  <polygon points="1,1 1,13 4,10 7,17 9,16 6,9 11,9 1,1" fill="#f9e2af"/>
+</svg>
