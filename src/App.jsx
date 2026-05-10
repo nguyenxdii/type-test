@@ -2,20 +2,15 @@ import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import './index.css';
 
-import english1k from './assets/languages/english_1k.json';
-import vietnamese1k from './assets/languages/vietnamese_1k.json';
-
-const WORD_LISTS = {
-  en: english1k.words,
-  vi: vietnamese1k.words
-};
 // Project configuration
 const TEST_DURATION = 60;
 
 function App() {
+  const [wordLists, setWordLists] = useState({ en: [], vi: [] });
   const [lang, setLang] = useState('en');
   const [words, setWords] = useState([]);
   const [currentWordIdx, setCurrentWordIdx] = useState(0);
+
   const [inputValue, setInputValue] = useState('');
   const [userInputStatus, setUserInputStatus] = useState([]);
   const [timeLeft, setTimeLeft] = useState(TEST_DURATION);
@@ -55,19 +50,32 @@ function App() {
         .catch(e => console.warn("Audio Load Warning:", key, e));
     });
 
-    generateWords();
+    // Load languages từ public/languages/
+    Promise.all([
+      fetch('/languages/english_1k.json').then(r => r.json()),
+      fetch('/languages/vietnamese_1k.json').then(r => r.json())
+    ]).then(([enData, viData]) => {
+      setWordLists({ en: enData.words, vi: viData.words });
+      const list = enData.words;
+      const shuffled = [...list].sort(() => Math.random() - 0.5);
+      setWords(shuffled.slice(0, 200));
+    }).catch(err => console.error("Language Load Error:", err));
   }, []);
 
   useEffect(() => {
-    generateWords();
-  }, [lang]);
+    if (wordLists[lang].length > 0) {
+      generateWords();
+    }
+  }, [lang, wordLists]);
+
 
   useEffect(() => { lineHeightRef.current = 0; }, [words]);
 
   const generateWords = () => {
-    const list = WORD_LISTS[lang];
-    const randomWords = Array.from({ length: 200 }, () => list[Math.floor(Math.random() * list.length)]);
-    setWords(randomWords);
+    const list = wordLists[lang];
+    if (!list || list.length === 0) return;
+    const shuffled = [...list].sort(() => Math.random() - 0.5);
+    setWords(shuffled.slice(0, 200));
     resetTest(false);
   };
 
